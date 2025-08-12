@@ -1,4 +1,7 @@
 # Meus-projetos
+
+#Neste código é feito um cálculo de probabilidade de uma coleta imaginária de minerio de ferro
+
 import random
 
 import time
