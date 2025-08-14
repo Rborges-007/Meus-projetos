@@ -1,4 +1,3 @@
-.py
 #Projeto semana 1
 
 #Neste código é feito um calculo de escolha e probabilidade de coleta de materiais.
