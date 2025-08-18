@@ -3,7 +3,7 @@ lista = [2, 5, 8, 9, 12, 15, 18]
 
 # Lista que armazenará os números menores ou iguais a 15
 nova_lista = []
-
+ 
 # Adiciona à nova_lista apenas os números <= 15
 for numero in lista:
     if numero <= 15:
