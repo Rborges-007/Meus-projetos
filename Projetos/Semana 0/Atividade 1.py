@@ -4,7 +4,7 @@
 
 import random
 
-import time
+import time 
 
 
 golpes_por_pedra = 6
