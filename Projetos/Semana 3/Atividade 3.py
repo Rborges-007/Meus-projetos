@@ -10,3 +10,4 @@ lista = [1, 2]
 print(soma_lista(lista))  # Saída será 3
 
 
+ 
