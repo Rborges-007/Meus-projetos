@@ -1,4 +1,4 @@
-import math
+import math 
 
 ld = 8  # Define o comprimento do lado do hexágono
 r3 = 1.732  # Aproximação da raiz quadrada de 3
