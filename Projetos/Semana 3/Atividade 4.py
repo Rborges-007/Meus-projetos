@@ -6,5 +6,5 @@ nomes_maiusculo = tuple(nome.upper() for nome in nomes)
 
 # Exibe a nova tupla
 print(nomes_maiusculo)
-
+ 
 
