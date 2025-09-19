@@ -1,0 +1,204 @@
+<!DOCTYPE html><html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sorteio de Itens Mágicos</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  background: rgba(0,0,0,0.7);
+  border-radius: 25px;
+  padding: 30px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  backdrop-filter: blur(10px);
+}
+
+h1 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+  text-align: center;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+}
+
+.input-group {
+  display: flex;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+input {
+  flex: 1;
+  padding: 12px 15px;
+  border-radius: 15px 0 0 15px;
+  border: none;
+  font-size: 1rem;
+  outline: none;
+}
+
+button {
+  padding: 12px 20px;
+  border-radius: 0 15px 15px 0;
+  border: none;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover { transform: scale(1.05); }
+
+#lista {
+  list-style: none;
+  width: 100%;
+  max-height: 150px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.1);
+  padding: 10px 15px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+li button { background: #ff4d4d; color: #fff; border-radius: 50%; padding: 5px 10px; font-size: 0.9rem; }
+
+#rolagem {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0;
+  min-height: 50px;
+  padding: 10px;
+  width: 100%;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+  transition: all 0.3s ease;
+}
+
+#resultado {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 25px;
+  padding: 20px;
+  width: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24, #fde68a);
+  color: #000;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  display: none;
+  animation: aparecer 0.8s ease-in-out forwards;
+}
+
+@keyframes aparecer { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+
+.botao-principal { background: #f59e0b; color: #000; margin-top: 10px; width: 100%; font-size: 1.2rem; border-radius: 20px; padding: 12px; transition: 0.3s; }
+.botao-principal:hover { background: #fbbf24; }
+
+.botao-reset { background: #ff4d4d; color: #fff; margin-top: 10px; width: 100%; font-size: 1.2rem; border-radius: 20px; padding: 12px; transition: 0.3s; }
+.botao-reset:hover { background: #ff6666; }
+
+p#itemAtual { font-size: 1.2rem; margin-bottom: 15px; font-weight: 600; text-align: center; }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎲 SORTEIO 🎲</h1><div class="input-group">
+  <input type="text" id="nomeInput" placeholder="Adicionar nome do aventureiro">
+  <button onclick="adicionarNome()">+</button>
+</div>
+
+<div class="input-group">
+  <input type="text" id="itemInput" placeholder="Nome do item em disputa">
+  <button onclick="definirItem()">✔</button>
+</div>
+
+<ul id="lista"></ul>
+<p id="itemAtual"></p>
+
+<button class="botao-principal" onclick="iniciarSorteio()" id="botaoSorteio">Iniciar Sorteio</button>
+<button class="botao-reset" onclick="resetar()">Resetar</button>
+
+<div id="rolagem"></div>
+<div id="resultado"></div>
+
+  </div>  <script>
+    let nomes = [];
+    let item = '';
+    let rolando = false;
+    let intervalo;
+
+    function adicionarNome() {
+      const input = document.getElementById('nomeInput');
+      if(input.value.trim() !== '') { nomes.push(input.value.trim()); atualizarLista(); input.value = ''; }
+    }
+
+    function definirItem() {
+      const input = document.getElementById('itemInput');
+      if(input.value.trim() !== '') { item = input.value.trim(); document.getElementById('itemAtual').innerText = 'Item em disputa: ' + item; input.value = ''; }
+    }
+
+    function atualizarLista() {
+      const lista = document.getElementById('lista');
+      lista.innerHTML = nomes.map((n,i) => `<li>${n} <button onclick='removerNome(${i})'>❌</button></li>`).join('');
+    }
+
+    function removerNome(i) { nomes.splice(i,1); atualizarLista(); }
+
+    function iniciarSorteio() {
+      if(nomes.length === 0 || !item) { alert('Adicione participantes e item!'); return; }
+      rolando = true;
+      document.getElementById('resultado').style.display = 'none';
+      let contador = 0;
+      let velocidade = 100;
+
+      intervalo = setInterval(() => {
+        const nomeAleatorio = nomes[Math.floor(Math.random() * nomes.length)];
+        document.getElementById('rolagem').innerText = nomeAleatorio;
+        contador++;
+        if(contador > 30) {
+          clearInterval(intervalo);
+          const vencedor = nomes[Math.floor(Math.random() * nomes.length)];
+          document.getElementById('rolagem').innerText = '';
+          document.getElementById('resultado').innerHTML = `🎉 Parabéns ${vencedor}! Você ganhou o item "${item}"! 🎉`;
+          document.getElementById('resultado').style.display = 'block';
+          rolando = false;
+          confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+          confetti({ particleCount: 150, spread: 120, origin: { y: 0.7 } });
+        }
+        velocidade += 10;
+      }, velocidade);
+    }
+
+    function resetar() { nomes = []; item = ''; rolando = false; clearInterval(intervalo); document.getElementById('lista').innerHTML = ''; document.getElementById('itemAtual').innerText = ''; document.getElementById('rolagem').innerText = ''; document.getElementById('resultado').style.display = 'none'; }
+  </script></body>
+</html>
