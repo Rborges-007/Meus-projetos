@@ -1,1 +1,312 @@
 
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ficha de Chefe — RPG</title>
+<style>
+  :root{
+    --bg:#f5f7fa;
+    --card:#ffffff;
+    --accent:#2563eb;
+    --muted:#64748b;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, #f0f4ff 0%, #ffffff 70%);
+    color:#1e293b;
+    padding:20px;
+  }
+
+  .container{
+    max-width:1100px;
+    margin:0 auto;
+    background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(245,247,250,0.8));
+    border-radius:14px;
+    padding:24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+
+  header{ margin-bottom:18px; }
+  .title h1{ margin:0; font-size:28px; color:var(--accent); }
+  .subtitle{ margin-top:6px; color:var(--muted); font-size:13px; }
+
+  .layout{
+    display:grid;
+    grid-template-columns: 360px 1fr;
+    gap:18px;
+  }
+
+  .boss-card{
+    background: var(--card);
+    border-radius:12px;
+    padding:12px;
+    border:1px solid rgba(0,0,0,0.05);
+  }
+  .photo-area{
+    width:100%;
+    height:420px;
+    border-radius:10px;
+    background:#e2e8f0;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .photo-area img{ width:100%; height:100%; object-fit:cover; }
+
+  .info{ display:flex; flex-direction:column; gap:12px; }
+
+  .name-edit{
+    background:var(--card);
+    padding:12px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border:1px solid rgba(0,0,0,0.05);
+  }
+  .name-edit .name{ font-size:20px; font-weight:700; color:var(--accent); }
+
+  .life-box{ text-align:right; }
+  .life-box .label{ font-size:12px; color:var(--muted); }
+  .life-box .value{ font-weight:700; font-size:16px; margin-top:4px; color:#dc2626; }
+
+  .life-controls{
+    display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; justify-content:flex-end;
+  }
+  .life-controls input{
+    width:80px; padding:6px; border-radius:6px;
+    border:1px solid rgba(0,0,0,0.2);
+    background:#f8fafc; color:#1e293b; text-align:center;
+  }
+  .life-controls button{
+    padding:6px 12px; border:none; border-radius:6px;
+    background:var(--accent); color:#fff; font-weight:bold; cursor:pointer;
+    transition:0.2s;
+  }
+  .life-controls button:hover{ background:#1e40af; }
+
+  /* painel de edição */
+  .edit-panel{
+    display:none;
+    background:var(--card);
+    border:1px solid rgba(0,0,0,0.1);
+    padding:12px;
+    border-radius:10px;
+  }
+  .edit-panel.active{ display:block; }
+  .edit-panel h3{ margin:0 0 10px 0; font-size:16px; color:var(--accent); }
+  .edit-panel input, .edit-panel textarea{
+    width:100%; padding:8px; margin-top:6px;
+    border-radius:6px; border:1px solid rgba(0,0,0,0.2);
+    background:#f9fafb; color:#1e293b;
+  }
+  .edit-panel button{
+    margin-top:10px; padding:8px 14px;
+    border:none; border-radius:6px;
+    background:var(--accent); color:#fff; font-weight:bold; cursor:pointer;
+  }
+  .edit-panel button:hover{ background:#1e40af; }
+
+  .edit-toggle{
+    margin-top:8px; background:#10b981;
+    color:#fff; border:none; padding:6px 12px;
+    border-radius:6px; cursor:pointer; font-weight:bold;
+  }
+  .edit-toggle:hover{ background:#059669; }
+
+  .cards-wrap{
+    margin-top:8px; background:var(--card);
+    padding:12px; border-radius:12px;
+    border:1px solid rgba(0,0,0,0.05);
+  }
+
+  .cards-row{ display:flex; justify-content:center; gap:10px; margin-bottom:12px; }
+  .card{
+    width:90px; height:120px; perspective:1000px; cursor:pointer; transition: transform 0.3s ease;
+  }
+  .card:hover{ transform: scale(1.05); }
+  .card-inner{ position:relative; width:100%; height:100%; text-align:center; transition: transform 0.8s; transform-style:preserve-3d; }
+  .card.flipped .card-inner{ transform:rotateY(180deg); }
+
+  .card-front, .card-back{
+    position:absolute; width:100%; height:100%;
+    border-radius:8px; backface-visibility:hidden;
+    border:1px solid rgba(0,0,0,0.1);
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(180deg, #f9fafb, #e2e8f0);
+    box-shadow:0 6px 16px rgba(0,0,0,0.1);
+    padding:8px;
+  }
+  .card-front{ font-size:20px; font-weight:700; color:#0f172a; }
+  .card-back{ transform:rotateY(180deg); font-size:12px; color:#0f172a; background:linear-gradient(135deg,#dbeafe,#bfdbfe); }
+
+  footer{ margin-top:16px; font-size:12px; color:var(--muted); text-align:center; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="title">
+      <h1>Ficha de Chefe</h1>
+      <div class="subtitle">Nome, foto e cartas de ataque</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="boss-card">
+      <div class="photo-area">
+        <img src="Foto de Guilherme.jpg" alt="Boss" />
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="name-edit">
+        <div>
+          <div style="font-size:12px;color:var(--muted)">Nome do Chefe</div>
+          <div class="name" id="bossName">---</div>
+          <div id="bossDesc" style="font-size:13px; color:var(--muted); margin-top:4px"></div>
+        </div>
+        <div class="life-box">
+          <div class="label">Vida</div>
+          <div class="value" id="bossLife">---</div>
+          <div class="life-controls">
+            <input type="number" id="lifeValue" placeholder="Valor" />
+            <button id="applyDamage">Dano</button>
+            <button id="applyHeal">Curar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- botão para mostrar/ocultar edição -->
+      <button class="edit-toggle" id="toggleEdit">Editar Chefe</button>
+
+      <div class="edit-panel" id="editPanel">
+        <h3>Editar Informações</h3>
+        <input type="text" id="editName" placeholder="Nome do chefe" />
+        <textarea id="editDesc" placeholder="Descrição"></textarea>
+        <input type="number" id="editLife" placeholder="Vida" />
+        <textarea id="editCards" placeholder="Cartas (separe por vírgula)"></textarea>
+        <button id="saveBoss">Salvar Alterações</button>
+      </div>
+
+      <div class="cards-wrap">
+        <div style="margin-bottom:8px;font-size:14px;font-weight:bold">Cartas de Ataque</div>
+        <div class="cards-row" id="row1"></div>
+        <div class="cards-row" id="row2"></div>
+        <div class="cards-row" id="row3"></div>
+      </div>
+    </div>
+  </div>
+  <footer>Modelo interativo — clique nas cartas para virar</footer>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBMzuslA9id_6bTRlE1BUMWAyB6iK4DTC0",
+    authDomain: "bossfinal-3068e.firebaseapp.com",
+    databaseURL: "https://bossfinal-3068e-default-rtdb.firebaseio.com",
+    projectId: "bossfinal-3068e",
+    storageBucket: "bossfinal-3068e.firebasestorage.app",
+    messagingSenderId: "273621696671",
+    appId: "1:273621696671:web:ca0f8193cee257d8c862aa",
+    measurementId: "G-7JWT8G79QJ"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const bossRef = ref(db, "Boss");
+
+  let currentBoss = null;
+
+  onValue(bossRef, (snapshot) => {
+    if (snapshot.exists()) {
+      currentBoss = snapshot.val();
+      document.getElementById("bossName").textContent = currentBoss.nome;
+      document.getElementById("bossLife").textContent = currentBoss.vida;
+      document.getElementById("bossDesc").textContent = currentBoss.descricao || "";
+
+      document.getElementById("row1").innerHTML = "";
+      document.getElementById("row2").innerHTML = "";
+      document.getElementById("row3").innerHTML = "";
+
+      currentBoss.ataques.forEach((ataque, index) => {
+        if (index === 0) return;
+        const card = createCard(index, ataque);
+        if (index <= 5) document.getElementById("row1").appendChild(card);
+        else document.getElementById("row2").appendChild(card);
+      });
+
+      for (const key of ["J","Q","K"]) {
+        if (currentBoss.especiais[key]) {
+          const card = createCard(key, currentBoss.especiais[key]);
+          document.getElementById("row3").appendChild(card);
+        }
+      }
+    }
+  });
+
+  function createCard(face, backText) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-front">${face}</div>
+        <div class="card-back">${backText}</div>
+      </div>`;
+    card.addEventListener("click", () => card.classList.toggle("flipped"));
+    return card;
+  }
+
+  document.getElementById("applyDamage").addEventListener("click", () => {
+    const value = parseInt(document.getElementById("lifeValue").value);
+    if (!isNaN(value) && currentBoss) {
+      let newLife = parseInt(currentBoss.vida) - value;
+      if (newLife < 0) newLife = 0;
+      currentBoss.vida = newLife;
+      set(bossRef, currentBoss);
+    }
+  });
+
+  document.getElementById("applyHeal").addEventListener("click", () => {
+    const value = parseInt(document.getElementById("lifeValue").value);
+    if (!isNaN(value) && currentBoss) {
+      let newLife = parseInt(currentBoss.vida) + value;
+      currentBoss.vida = newLife;
+      set(bossRef, currentBoss);
+    }
+  });
+
+  // botão mostrar/ocultar edição
+  const toggleBtn = document.getElementById("toggleEdit");
+  const editPanel = document.getElementById("editPanel");
+  toggleBtn.addEventListener("click", () => {
+    editPanel.classList.toggle("active");
+  });
+
+  // salvar edições
+  document.getElementById("saveBoss").addEventListener("click", () => {
+    if (!currentBoss) return;
+    currentBoss.nome = document.getElementById("editName").value || currentBoss.nome;
+    currentBoss.descricao = document.getElementById("editDesc").value || currentBoss.descricao;
+    currentBoss.vida = parseInt(document.getElementById("editLife").value) || currentBoss.vida;
+    const newCards = document.getElementById("editCards").value;
+    if (newCards) {
+      const list = newCards.split(",").map(s => s.trim());
+      currentBoss.ataques = [null, ...list.slice(0,10)];
+    }
+    set(bossRef, currentBoss);
+    editPanel.classList.remove("active");
+  });
+</script>
+</body>
+</html>
